@@ -1,0 +1,8 @@
+DOMAIN = "mqtt_button"
+CONF_HOST = "mqtt_host"
+CONF_PORT = "mqtt_port"
+CONF_USERNAME = "mqtt_username"
+CONF_PASSWORD = "mqtt_password"
+CONF_TOPIC = "mqtt_topic"
+CONF_PREFIX = "mqtt_prefix"
+CONF_NAME = "button_name"
