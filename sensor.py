@@ -23,13 +23,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
 class ButtonEvent(SensorEntity):
     def __init__(self, device: dr.DeviceEntry, name: str, topic: str):
         super().__init__()
+        @callback
         def short_press_handler():
-            self._state = SHORT_PRESS
+            self._event = SHORT_PRESS
+            self.async_write_ha_state()
+        @callback
         def long_press_handler():
-            self._state = LONG_PRESS
+            self._event = LONG_PRESS
+            self.async_write_ha_state()
+        @callback
         def double_press_handler():
-            self._state = DOUBLE_PRESS
-        self._state = None
+            self._event = DOUBLE_PRESS
+            self.async_write_ha_state()
+        self._event = None
         self._device = device
         self._name = name
         self._topic = topic
@@ -41,13 +47,11 @@ class ButtonEvent(SensorEntity):
 
     async def async_added_to_hass(self):
         """Run when entity is about to be added to Home Assistant."""
-        await async_subscribe(self.hass, self._topic, self.message_received)
+        @callback
+        def message_received(self, msg):
+            self._detector.process_event(msg.payload.decode("utf-8"))
+        await async_subscribe(self.hass, self._topic, message_received)
 
-
-    def message_received(self, msg):
-        """Handle new MQTT messages."""
-        self._state = msg.payload
-        self.async_write_ha_state()
 
     @property
     def device_info(self) -> DeviceInfo:
@@ -63,7 +67,7 @@ class ButtonEvent(SensorEntity):
 
     @property
     def state(self):
-        return self._state
+        return self._event
 
     @property
     def id(self):
