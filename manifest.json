@@ -2,6 +2,7 @@
   "domain": "mqtt_button",
   "name": "MQTT Button",
   "codeowners": ["@markusmauch"],
+  "version": "0.0.2",
   "config_flow": true,
   "dependencies": ["mqtt"],
   "documentation": "https://github.com/markusmauch/mqtt_button/readme.md",
