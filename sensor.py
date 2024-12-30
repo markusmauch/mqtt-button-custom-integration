@@ -29,6 +29,7 @@ class ButtonEvent(SensorEntity):
             self._state = LONG_PRESS
         def double_press_handler():
             self._state = DOUBLE_PRESS
+        self._state = None
         self._device = device
         self._name = name
         self._topic = topic
