@@ -2,7 +2,7 @@
 
 import asyncio
 
-from homeassistant.components.mqtt import async_subscribe, ReceiveMessage
+from homeassistant.components.mqtt import ReceiveMessage, async_subscribe
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
@@ -10,12 +10,15 @@ from homeassistant.helpers import device_registry as dr, json
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.template import Template
+from homeassistant.util.json import json_loads
 
 from .const import CONF_NAME, CONF_TOPIC, CONF_VALUE_TEMPLATE, DOMAIN
 from .detector import (
     DOUBLE_PRESS,
+    DOWN,
     LONG_PRESS,
     SHORT_PRESS,
+    UP,
     ButtonEventsDetector,
     EventType,
 )
@@ -70,7 +73,7 @@ class ButtonEvent(SensorEntity):
     async def async_added_to_hass(self) -> None:
         """Subscribe to MQTT topic when entity is added to Home Assistant."""
         self._unsubscribe = await async_subscribe(
-            self._hass, self._topic, self.message_received
+            self.hass, self._topic, self.message_received
         )
 
     async def async_remove(self):
@@ -83,13 +86,13 @@ class ButtonEvent(SensorEntity):
         """Send the payload to the events detector."""
         val = msg.payload
         if self._value_template is not None:
-            val = self.apply_json_string_template(self._value_template, val)
-        self._detector.process_event(val)
+            val = self.apply_jinja_template(self._value_template, val)
+        self._detector.process_event(DOWN if val else UP)
 
     def apply_jinja_template(self, template_string, json_string):
         """Apply a Jinja2 template to a string with given variables."""
         try:
-            json_data = json.loads(json_string)
+            json_data = json_loads(json_string)
         except json.JSONDecodeError as e:
             return f"Error parsing JSON string: {e}"
         template = Template(template_string, self.hass)
