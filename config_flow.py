@@ -16,11 +16,11 @@ _LOGGER = logging.getLogger(__name__)
 
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
-        vol.Required(CONF_NAME, "Name"): str,
+        vol.Required(CONF_NAME, "Device name", "Light Switch"): str,
         vol.Required(
-            CONF_TOPIC, "MQTT topic", "zigbee2mqtt/Lichtschalter Terrasse"
+            CONF_TOPIC, "MQTT topic", "zigbee2mqtt/LightSwitch"
         ): str,
-        vol.Optional(CONF_VALUE_TEMPLATE, "Value template", "{{contact}}"): str,
+        vol.Required(CONF_VALUE_TEMPLATE, "Value template", "{{contact}}"): str,
     }
 )
 
